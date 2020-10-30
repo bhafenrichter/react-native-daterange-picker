@@ -46,8 +46,11 @@ const DateRangePicker = ({
   buttonStyle,
   buttonTextStyle,
   presetButtons,
+  opened,
+  onClose,
+  closeButton
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(opened || false);
   const [weeks, setWeeks] = useState([]);
   const [selecting, setSelecting] = useState(false);
   const [dayHeaders, setDayHeaders] = useState([]);
@@ -87,13 +90,17 @@ const DateRangePicker = ({
     setIsOpen(true);
   };
 
-  const onClose = () => {
+  const close = () => {
     setIsOpen(false);
     setSelecting(false);
     if (!endDate) {
       onChange({
         endDate: startDate,
       });
+    }
+
+    if (onClose) {
+      onClose();
     }
   };
 
@@ -200,6 +207,9 @@ const DateRangePicker = ({
   );
 
   useEffect(() => {
+    // set the variable on state change
+    setIsOpen(opened);
+
     function populateHeaders() {
       let _dayHeaders = [];
       for (let i = 0; i <= 6; ++i) {
@@ -291,26 +301,16 @@ const DateRangePicker = ({
     dayTextStyle,
     disabledTextStyle,
     select,
+    opened,
   ]);
 
-  const node = (
-    <View>
-      <TouchableWithoutFeedback onPress={onOpen}>
-        {children ? (
-          children
-        ) : (
-          <View>
-            <Text>Click me to show date picker</Text>
-          </View>
-        )}
-      </TouchableWithoutFeedback>
-    </View>
-  );
+  // placeholder text
+  const node = null;
 
   return isOpen ? (
     <>
       <View style={mergedStyles.backdrop}>
-        <TouchableWithoutFeedback style={styles.closeTrigger} onPress={onClose}>
+        <TouchableWithoutFeedback style={styles.closeTrigger} onPress={close}>
           <View style={styles.closeContainer} />
         </TouchableWithoutFeedback>
         <View>
@@ -346,6 +346,17 @@ const DateRangePicker = ({
               )}
               {weeks}
             </View>
+            {closeButton && (
+              <View style={mergedStyles.buttonContainer}>
+                <Button
+                  buttonStyle={buttonStyle}
+                  buttonTextStyle={buttonTextStyle}
+                  onPress={close}
+                >
+                  Close
+                </Button>
+              </View>
+            )}
             {presetButtons && (
               <View style={mergedStyles.buttonContainer}>
                 <Button
